@@ -26,6 +26,16 @@
 
                         <v-text-field :rules="[v => !!v || 'Campo obligatorio!']" v-model="nuevo_usuario.email" outlined label="Email" prepend-icon="mdi-email" type="email" autocomplete="off"></v-text-field>
 
+                        <v-divider class="mb-5"></v-divider>
+
+                        <v-checkbox
+                            v-model="privado"
+                            class="mt-0 pt-0"
+                            label="Campamento Privado"
+                            prepend-icon="mdi-domain"
+                        ></v-checkbox>
+
+
                         <v-combobox :rules="[v => !!v || 'Campo obligatorio!']" v-model="nuevo_usuario.campamento" outlined label="Campamento" :items="campamentos" item-text="nombre" item-value="id" prepend-icon="mdi-medical-bag"></v-combobox>
 
                         <v-combobox :rules="[v => !!v || 'Campo obligatorio!']" v-model="nuevo_usuario.rol" outlined label="Rol" :items="roles" item-text="nombre" item-value="id" prepend-icon="mdi-badge-account-horizontal-outline"></v-combobox>
@@ -85,14 +95,15 @@
                 registrando: false,
                 dialog: false,
                 message: null,
-                status: null
+                status: null,
+                privado: false
             }
         },
         methods: {
             obtener_dependencias(){
 
-                this.axios.get(process.env.VUE_APP_API_URL + 'datos_registro.php').then((response) => {
-                    console.log(response.data)
+                this.axios.get(process.env.VUE_APP_API_URL + 'datos_registro.php')
+                .then((response) => {
                     this.campamentos = response.data.campamentos
                     this.roles = response.data.roles
                 })
@@ -121,7 +132,34 @@
                 }
                 
 
+            },
+            obtener_campamentos_privados(){
+
+                this.axios.get(process.env.VUE_APP_API_URL + 'obtener_campamentos_privados.php')
+                .then((response) => {
+                    console.log(response.data)
+                    this.campamentos = response.data.campamentos
+                    this.roles = response.data.roles
+                })
+
+            }   
+        },
+        watch: {
+
+            privado(val){
+
+                this.campamentos = []
+                this.roles = []
+                this.nuevo_usuario.rol = null
+                this.nuevo_usuario.campamento = null
+
+                if (val) {
+                    this.obtener_campamentos_privados()
+                }else{
+                    this.obtener_dependencias()
+                }
             }
+
         },
         mounted(){
 

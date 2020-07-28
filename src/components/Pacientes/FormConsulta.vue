@@ -50,6 +50,14 @@
 											</v-col>
 
 											<v-col cols="12" sm="6" md="6">
+												<v-text-field :disabled="!usuario.editar_paciente || !usuario.editar_paciente_consulta" autocomplete="off" v-model="paciente.cui" label="Código Único de Identificación (APLICA CASO DE MENORES DE EDAD)" hide-details outlined></v-text-field>
+											</v-col>
+
+											<v-col cols="12" sm="6" md="6">
+												<v-text-field :disabled="!usuario.editar_paciente || !usuario.editar_paciente_consulta" autocomplete="off" v-model="paciente.pasaporte" label="Número de Pasaporte" hide-details outlined></v-text-field>
+											</v-col>
+
+											<v-col cols="12" sm="6" md="6">
 												<v-text-field :disabled="!usuario.editar_paciente || !usuario.editar_paciente_consulta" autocomplete="off" v-model="paciente.afiliacion_igss" label="Afiliación IGSS" hide-details outlined></v-text-field>
 											</v-col>
 
@@ -198,6 +206,23 @@
 													<span class="headline">{{ categoria.nombre }}</span>
 													<v-divider></v-divider>
 													<small>{{ categoria.descripcion }}</small>
+												</v-col>
+
+												<v-col v-if="categoria.id == 2" cols="12">
+													<v-row>
+
+														<v-col cols="12" sm="6" md="6">
+															<v-text-field :disabled="!usuario.editar_paciente || !usuario.editar_paciente_consulta" autocomplete="off" v-model="paciente.frecuencia_cardiaca" label="Frecuencia Cardíaca" hide-details outlined></v-text-field>
+														</v-col>
+
+														<v-col cols="12" sm="6" md="6">
+															<v-text-field :disabled="!usuario.editar_paciente || !usuario.editar_paciente_consulta" autocomplete="off" v-model="paciente.frecuencia_respiratoria" label="Frecuencia Respiratoria" hide-details outlined></v-text-field>
+														</v-col>
+
+														<v-col cols="12" sm="6" md="6">
+															<v-text-field :disabled="!usuario.editar_paciente || !usuario.editar_paciente_consulta" autocomplete="off" v-model="paciente.saturacion_oxigeno" label="Saturación de Oxígeno" hide-details outlined></v-text-field>
+														</v-col>
+													</v-row>
 												</v-col>
 												
 												<v-col v-for="verificacion in categoria.verificaciones" :key="verificacion.id" cols="12" sm="6" md="6">
@@ -378,13 +403,13 @@
 																		</v-radio-group>
 																	</v-col>
 																	<v-col>
-																		<v-textarea :disabled="!reporte.edit" v-if="reporte.requiere_medicamento == 'N'" v-model="reporte.razon_no_medicamento" rows="3" autocomplete="off" label="Razón por la que no hay prescripción médica" hide-details outlined required></v-textarea>
+																		<v-textarea :readonly="!reporte.edit" v-if="reporte.requiere_medicamento == 'N'" v-model="reporte.razon_no_medicamento" rows="3" autocomplete="off" label="Razón por la que no hay prescripción médica" hide-details outlined required></v-textarea>
 																	</v-col>
 																	<v-col cols="12" sm="6" md="6">
-																		<v-textarea :disabled="!reporte.edit" v-model="reporte.medicamento" rows="3" autocomplete="off"  label="Medicamento" hide-details outlined required></v-textarea>
+																		<v-textarea :readonly="!reporte.edit" v-model="reporte.medicamento" rows="3" autocomplete="off"  label="Medicamento" hide-details outlined required></v-textarea>
 																	</v-col>
 																	<v-col cols="12" sm="6" md="6">
-																		<v-textarea :disabled="!reporte.edit" v-model="reporte.observacion" rows="3" autocomplete="off" label="Observación" hide-details outlined required></v-textarea>
+																		<v-textarea :readonly="!reporte.edit" v-model="reporte.observacion" rows="3" autocomplete="off" label="Observación" hide-details outlined required></v-textarea>
 																	</v-col>
 																	<v-col cols="12" sm="6" md="6">
 
@@ -400,7 +425,7 @@
 
 																	<v-col cols="12" sm="12" md="12">
 
-																		<v-textarea :disabled="!reporte.edit" v-model="reporte.otro_diagnostico" rows="3" autocomplete="off" label="Otro Diagnóstico" hide-details outlined required></v-textarea>
+																		<v-textarea :readonly="!reporte.edit" v-model="reporte.otro_diagnostico" rows="3" autocomplete="off" label="Otro Diagnóstico" hide-details outlined required></v-textarea>
 
 																	</v-col>
 																	

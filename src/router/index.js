@@ -10,6 +10,10 @@ import ControlColas from '../views/ControlColas.vue'
 import Farmacia from '../views/Farmacia.vue'
 import ConsultaGeneral from '../views/ConsultaGeneral.vue'
 
+// Privado
+import ConsultaPrivado from '../views/Consulta_Privado'
+import PretriajePrivado from '../views/Pretriaje_Privado'
+
 Vue.use(VueRouter)
 
 	const routes = [
@@ -57,7 +61,19 @@ Vue.use(VueRouter)
 				path: '/home/consulta_general',
 				name: 'consulta_general',
 				component: ConsultaGeneral,
-			}
+			},
+			// Privado
+			{
+				path: '/home/pacientes_privado',
+				name: 'pacientes_privado',
+				component: PretriajePrivado,
+			},
+			{
+				path: '/home/consulta_privado',
+				name: 'consulta_privado',
+				component: ConsultaPrivado,
+			},
+
 		]
 	},
   

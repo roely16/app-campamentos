@@ -50,6 +50,14 @@
 											</v-col>
 
 											<v-col cols="12" sm="6" md="6">
+												<v-text-field :disabled="!usuario.editar_paciente" autocomplete="off" v-model="paciente.cui" label="Código Único de Identificación (APLICA CASO DE MENORES DE EDAD)" hide-details outlined></v-text-field>
+											</v-col>
+
+											<v-col cols="12" sm="6" md="6">
+												<v-text-field :disabled="!usuario.editar_paciente" autocomplete="off" v-model="paciente.pasaporte" label="Número de Pasaporte" hide-details outlined></v-text-field>
+											</v-col>
+
+											<v-col cols="12" sm="6" md="6">
 												<v-text-field :disabled="!usuario.editar_paciente" autocomplete="off" v-model="paciente.afiliacion_igss" label="Afiliación IGSS" hide-details outlined></v-text-field>
 											</v-col>
 
@@ -197,6 +205,23 @@
 													<span class="headline">{{ categoria.nombre }}</span>
 													<v-divider></v-divider>
 													<small>{{ categoria.descripcion }}</small>
+												</v-col>
+
+												<v-col v-if="categoria.id == 2" cols="12">
+													<v-row>
+
+														<v-col cols="12" sm="6" md="6">
+															<v-text-field :disabled="!usuario.editar_paciente" autocomplete="off" v-model="paciente.frecuencia_cardiaca" label="Frecuencia Cardíaca" hide-details outlined></v-text-field>
+														</v-col>
+
+														<v-col cols="12" sm="6" md="6">
+															<v-text-field :disabled="!usuario.editar_paciente" autocomplete="off" v-model="paciente.frecuencia_respiratoria" label="Frecuencia Respiratoria" hide-details outlined></v-text-field>
+														</v-col>
+
+														<v-col cols="12" sm="6" md="6">
+															<v-text-field :disabled="!usuario.editar_paciente" autocomplete="off" v-model="paciente.saturacion_oxigeno" label="Saturación de Oxígeno" hide-details outlined></v-text-field>
+														</v-col>
+													</v-row>
 												</v-col>
 												
 												<v-col v-for="verificacion in categoria.verificaciones" :key="verificacion.id" cols="12" sm="6" md="6">
@@ -538,6 +563,8 @@
 				apellido: "",
 				segundo_apellido: "",
 				dpi: "",
+				cui: "",
+				pasaporte: "",
 				genero: null,
 				fecha_nacimiento: "",
 				edad: "",
@@ -560,7 +587,10 @@
 				otra_colonia: "",
 				direccion: "",
 				id_clasificacion: null,
-				id_colonia: null
+				id_colonia: null,
+				frecuencia_cardiaca: "",
+				frecuencia_respiratoria: "",
+				saturacion_oxigeno: ""
 			},
 			zonas: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,21,24,25],
 			bitacora: [],
@@ -589,6 +619,8 @@
 					apellido: "",
 					segundo_apellido: "",
 					dpi: "",
+					cui: "",
+					pasaporte: "",
 					genero: null,
 					fecha_nacimiento: "",
 					edad: "",
@@ -611,7 +643,10 @@
 					otra_colonia: "",
 					direccion: "",
 					id_clasificacion: null,
-					id_colonia: null
+					id_colonia: null,
+					frecuencia_cardiaca: "",
+					frecuencia_respiratoria: "",
+					saturacion_oxigeno: ""
 				}
 				this.$emit('closeDialog')
 
