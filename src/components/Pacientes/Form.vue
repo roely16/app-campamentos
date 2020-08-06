@@ -13,7 +13,7 @@
 						</v-toolbar-title>
 						<v-spacer></v-spacer>
 						<v-toolbar-items v-if="usuario">
-							<v-btn :disabled="!usuario.editar_paciente" dark text @click="obtener_detalle ? editar_paciente() : registrar_paciente()">
+							<v-btn :loading="isSaving" :disabled="!usuario.editar_paciente" dark text @click="obtener_detalle ? editar_paciente() : registrar_paciente()">
 								<v-icon>mdi-content-save</v-icon>
 							</v-btn>
 						</v-toolbar-items>
@@ -102,9 +102,16 @@
 													</v-date-picker>
 												</v-menu>
 											</v-col>
-											<v-col cols="12" sm="6" md="6">
-												<v-text-field :disabled="!usuario.editar_paciente" autocomplete="off" :rules="[v => !!v || 'Campo obligatorio!']" v-model="paciente.edad" label="Edad" hide-details outlined></v-text-field>
+											<v-col cols="6" sm="6" md="6">
+												<v-text-field type="number" :disabled="!usuario.editar_paciente" autocomplete="off" :rules="[v => !!v || 'Campo obligatorio!']" v-model="paciente.edad" label="Edad" hide-details outlined></v-text-field>
 											</v-col>
+											<!-- <v-col cols="6" sm="3" md="2">
+												<v-checkbox
+													v-model="paciente.edad_meses"
+													label="Edad en meses"
+													value="S"
+												></v-checkbox>
+											</v-col> -->
 
 											<v-col cols="12" sm="6" md="6">
 												<v-text-field :disabled="!usuario.editar_paciente" autocomplete="off" v-model="paciente.numero_contacto" type="number" label="Número de contacto telefónico" hide-details outlined></v-text-field>
@@ -590,7 +597,8 @@
 				id_colonia: null,
 				frecuencia_cardiaca: "",
 				frecuencia_respiratoria: "",
-				saturacion_oxigeno: ""
+				saturacion_oxigeno: "",
+				edad_meses: ""
 			},
 			zonas: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,21,24,25],
 			bitacora: [],
@@ -604,7 +612,8 @@
 			},
 			categorias: [],
 			clasificacion: [],
-			colonias: []
+			colonias: [],
+			isSaving: false
 		}),
 		methods:{
 
@@ -646,7 +655,8 @@
 					id_colonia: null,
 					frecuencia_cardiaca: "",
 					frecuencia_respiratoria: "",
-					saturacion_oxigeno: ""
+					saturacion_oxigeno: "",
+					edad_meses: ""
 				}
 				this.$emit('closeDialog')
 
@@ -677,6 +687,8 @@
 
 				if (this.valid_form) {
 					
+					this.isSaving = true
+					
 					let usuario = JSON.parse(localStorage.getItem('usuario-campamentos'))
 
 					this.paciente.id_campamento = usuario.id_campamento
@@ -687,14 +699,28 @@
 					this.axios.post(process.env.VUE_APP_API_URL + 'registrar_paciente.php', this.paciente)
 					.then((response) => {
 
-						Swal.fire({
-							title: response.data.title,
-							html: response.data.message,
-							icon: 'success'
-						}).then(() => {
-							this.closeDialog()
-							this.$emit('actualizarTabla')
-						})
+						if (response.data.code == 200) {
+
+							Swal.fire({
+								title: response.data.title,
+								html: response.data.message,
+								icon: 'success'
+							}).then(() => {
+								this.closeDialog()
+								this.$emit('actualizarTabla')
+							})
+
+						}else{
+
+							Swal.fire({
+								icon: 'error',
+								title: response.data.title,
+								html: response.data.message,
+							})
+						}
+
+						this.isSaving = false
+						
 
 					})
 
@@ -702,6 +728,8 @@
 
 			},
 			editar_paciente(){
+
+				console.log(this.paciente);
 
 				this.$refs.form_paciente.validate()
 
