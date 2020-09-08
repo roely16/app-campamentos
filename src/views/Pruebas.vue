@@ -7,7 +7,7 @@
                 </v-col>
                 <v-col align="end">
                     <h1 class="pb-0 mb-0" style="font-size: 3em">{{ items.length }}</h1>
-                    <small class="font-weight-light mt-0 pt-0">Kits recomendados</small>
+                    <small class="font-weight-light mt-0 pt-0">Pruebas Pendientes</small>
                 </v-col>
             </v-row>
             <v-row>
@@ -50,21 +50,14 @@
                             
                         </template>
                         
-                        <template v-slot:item.requiere_azitromicina="{ item }"> 
-                            <v-chip small v-if="item.requiere_azitromicina" color="red darken-1" dark>SI</v-chip>
-                            <v-chip small v-if="!item.requiere_azitromicina" color="blue darken-1" dark>NO</v-chip>
-                        </template>
-
-                        
-
                         <template v-slot:item.accion="{ item }">
-                            <v-btn @click="atender(item)" x-small dark color="red darken-1">
-                                PENDIENTE
+                            <v-btn tile icon @click="atender(item)" dark color="success">
+                                <v-icon dark>mdi-check</v-icon>
                             </v-btn>
 
-                            <v-btn class="ml-3" tile icon  @click="detalle(item)" small color="primary">
+                            <!-- <v-btn class="ml-3" tile icon  @click="detalle(item)" small color="primary">
                                 <v-icon dark>mdi-pencil</v-icon>
-                            </v-btn>
+                            </v-btn> -->
 
                         </template>
 
@@ -81,7 +74,7 @@
 
             <v-dialog v-model="dialog" max-width="400" @click:outside="() => { this.$refs.form_entrega.reset() }">
                 <v-card>
-                    <v-card-title class="headline">Entregar Kit</v-card-title>
+                    <v-card-title class="headline">Prueba Realizada</v-card-title>
                     <v-card-text>
                         <v-form ref="form_entrega" v-model="valid_form">
                             <v-row>
@@ -90,11 +83,23 @@
                                     <h2>{{ paciente.nombre }} {{ paciente.segundo_nombre }} {{ paciente.apellido }} {{ paciente.segundo_apellido }}</h2>
                                 </v-col>
                                 <v-col cols="12">
-                                    <v-textarea :rules="[v => !!v || 'Campo obligatorio!']" v-model="entrega_medicamento.recibe" hide-details outlined rows="2" label="Nombre de quien recibe"></v-textarea>
+                                   
+                                    <small>Resultado: </small>
+                                    <v-radio-group :rules="[v => !!v || 'Campo obligatorio!']"  v-model="prueba.resultado" :mandatory="false">
+                                        <v-radio label="Positivo" value="P"></v-radio>
+                                        <v-radio label="Negativo" value="N"></v-radio>
+                                    </v-radio-group>
                                 </v-col>
 
                                 <v-col cols="12">
-                                    <v-textarea v-model="entrega_medicamento.comentarios" hide-details outlined rows="3" label="Comentarios"></v-textarea>
+                                    
+                                    <small>Entrega de Kit: </small>
+                                    <v-checkbox v-model="prueba.entrega_kit" label="Se Entrego Kit"></v-checkbox>
+                                    
+                                </v-col>
+
+                                <v-col cols="12">
+                                    <v-textarea v-model="prueba.observaciones" hide-details outlined rows="3" label="Observaciones"></v-textarea>
                                 </v-col>
                             </v-row>
                         </v-form>
@@ -138,6 +143,7 @@
 <script>
 
     import Form from '@/components/Pacientes/FormConsulta.vue'
+    // eslint-disable-next-line no-unused-vars
     import Swal from 'sweetalert2'
 
     export default {
@@ -153,9 +159,10 @@
                 dialog: false,
                 paciente: {},
                 valid_form: true,
-                entrega_medicamento: {
-                    recibe: null,
-                    comentarios: null
+                prueba: {
+                    resultado: null,
+                    observaciones: null,
+                    entrega_kit: false
                 },
                 tab: null,
                 campamento_select: null,
@@ -164,6 +171,7 @@
                 usuario: null,
                 show_dialog: false,
                 obtener_detalle: false,
+                id_paciente: null
             }
         },
         methods: {
@@ -183,7 +191,7 @@
                     id_campamento: id_campamento
                 }
 
-                this.axios.post(process.env.VUE_APP_API_URL + 'obtener_farmacia.php', data)
+                this.axios.post(process.env.VUE_APP_API_URL + 'obtener_pruebas.php', data)
                 .then((response) => {
 
                     this.headers = response.data.headers
@@ -193,6 +201,36 @@
 
             },
             atender(paciente){
+
+                // Swal.fire({
+                //     title: 'Entrega de Constancia',
+                //     text: "Una vez indicado esto no se podrá revertir!",
+                //     icon: 'warning',
+                //     showCancelButton: true,
+                //     confirmButtonColor: '#3085d6',
+                //     cancelButtonColor: '#d33',
+                //     confirmButtonText: 'Entregada!',
+                //     cancelButtonText: 'Cancelar'
+                // }).then((result) => {
+
+                //     if (result.value) {
+
+                //         this.axios.post(process.env.VUE_APP_API_URL + 'constancia_entregada.php', paciente)
+                //         .then((response) => {
+                            
+                //             if (response.data) {
+                                
+                //                 Swal.fire(
+                //                     'Excelente!',
+                //                     'La información del paciente a sido actualizada.',
+                //                     'success'
+                //                 )
+                            
+                //             }
+                //         })
+                        
+                //     }
+                // })
 
                 this.dialog = true
                 this.paciente = paciente
@@ -204,16 +242,18 @@
 
                 if (this.valid_form) {
 
-                    this.entrega_medicamento.id_paciente = this.paciente.id
+                    this.prueba.id_paciente = this.paciente.id
 
-                    this.axios.post(process.env.VUE_APP_API_URL + 'entregar_kit.php', this.entrega_medicamento)
+                    console.log(this.prueba);
+
+                    this.axios.post(process.env.VUE_APP_API_URL + 'registrar_resultado.php', this.prueba)
                     .then((response) => {
-                        
+                        console.log(response.data);
                         if (response.data) {
                             
                             Swal.fire(
                                 'Excelente!',
-                                'Se ha registrado la entrega del kit.',
+                                'Se ha registro el resultado de la prueba.',
                                 'success'
                             ).then(() => {
 

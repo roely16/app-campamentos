@@ -14,7 +14,7 @@
 					
 				</v-col>
 				<v-col dense no-gutters cols="12" class="text-center pt-0 mt-0">
-					<v-btn @click="obtener_roles()" small color="primary" text>Configuración</v-btn>
+					<v-btn @click="campamentos_configuracion()" small color="primary" text>Configuración</v-btn>
 					<v-divider></v-divider>
 				</v-col>
 			</v-row>
@@ -196,6 +196,27 @@ export default {
 				
 			})
 			
+
+		},
+		campamentos_configuracion(){
+
+			let usuario = JSON.parse(localStorage.getItem('usuario-campamentos'))
+
+			let data = {
+				id: usuario.id
+			}
+
+			this.axios.post(process.env.VUE_APP_API_URL + 'campamentos_configuracion.php', data)
+			.then((response) => {
+				console.log(response.data);
+
+				this.campamentos = response.data.campamentos
+
+				let usuario = JSON.parse(localStorage.getItem('usuario-campamentos'))
+				this.campamento.id = usuario.id_campamento
+				this.campamento.id_usuario = usuario.id
+				this.mostrar_configuracion = true
+			})
 
 		}
 	},

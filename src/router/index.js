@@ -9,6 +9,10 @@ import Pacientes from '../views/Pacientes.vue'
 import ControlColas from '../views/ControlColas.vue'
 import Farmacia from '../views/Farmacia.vue'
 import ConsultaGeneral from '../views/ConsultaGeneral.vue'
+import Constancias from '../views/Constancias.vue'
+import CuentaAceptada from '../views/CuentaAceptada.vue'
+import CuentaRechazada from '../views/CuentaRechazada.vue'
+import Pruebas from '../views/Pruebas'
 
 // Privado
 import ConsultaPrivado from '../views/Consulta_Privado'
@@ -38,6 +42,16 @@ Vue.use(VueRouter)
 		component: ActivarCuenta
 	},
 	{
+		path: '/aceptar_cuenta/:id',
+		name: 'aceptar_cuenta',
+		component: CuentaAceptada
+	},
+	{
+		path: '/rechazar_cuenta/:id',
+		name: 'rechazar_cuenta',
+		component: CuentaRechazada
+	},
+	{
 		path: '/home',
 		name: 'home',
 		component: Home,
@@ -61,6 +75,16 @@ Vue.use(VueRouter)
 				path: '/home/consulta_general',
 				name: 'consulta_general',
 				component: ConsultaGeneral,
+			},
+			{
+				path: '/home/constancias',
+				name: 'constancias',
+				component: Constancias,
+			},
+			{
+				path: '/home/pruebas',
+				name: 'pruebas',
+				component: Pruebas,
 			},
 			// Privado
 			{

@@ -26,6 +26,9 @@
 								<v-tab v-if="usuario.ver_bitacora" :key="1">Bítacora de Consulta</v-tab>
 							</v-tabs>
 							<v-tabs-items v-model="tab">
+
+								<!-- Ficha del paciente -->
+
 								<v-tab-item :key="0">
 									<v-form ref="form_paciente" v-model="valid_form">
 										<v-row v-if="usuario" align="center">
@@ -254,53 +257,149 @@
 												
 											</v-row>
 
-											<v-col cols="12">
-												<span class="headline">Observaciones generales</span>
-												<v-divider></v-divider>
-											</v-col>
-											<v-col cols="8" sm="6" md="8">
-												<v-textarea :disabled="!usuario.editar_paciente" outlined label="Observaciones" rows="3" hint="Máximo 4,000 caracteres" counter="4000" v-model="paciente.observaciones"></v-textarea>
-											</v-col>
-											<v-col cols="4" sm="6" md="4">
-												<v-card :flat="!paciente.id_clasificacion" :elevation="paciente.id_clasificacion == 1 ? 10 : null" @click="() => {
-													
-													if(usuario.editar_paciente){
+											<v-row>
+												<v-col cols="12">
+													<span class="headline">Observaciones generales</span>
+													<v-divider></v-divider>
+												</v-col>
+												<v-col cols="8" sm="6" md="8">
+													<v-textarea :disabled="!usuario.editar_paciente" outlined label="Observaciones" rows="3" hint="Máximo 4,000 caracteres" counter="4000" v-model="paciente.observaciones"></v-textarea>
+												</v-col>
+												<v-col cols="4" sm="6" md="4">
+													<v-card :flat="!paciente.id_clasificacion" :elevation="paciente.id_clasificacion == 1 ? 10 : null" @click="() => {
+														
+														if(usuario.editar_paciente){
 
-														if(paciente.id_clasificacion == 1){
+															if(paciente.id_clasificacion == 1){
 
-															paciente.id_clasificacion = null
+																paciente.id_clasificacion = null
 
-														}else{
+															}else{
 
-															paciente.id_clasificacion = 1
+																paciente.id_clasificacion = 1
 
-														}
+															}
 
-													}	
+														}	
 
-												}" color="red darken-1" min-height="100">
-													<v-card-text>
-														<v-row justify="center" align="center" dense no-gutters>
-															<v-col>
-																<h1>E</h1>
-															</v-col>
-															<v-col v-if="paciente.id_clasificacion == 1" align="end">
-																<v-icon x-large>
-																	mdi-check
-																</v-icon>
-															</v-col>
-														</v-row>
-													</v-card-text>
-													<v-card-text class="pt-0 mt-0">
-														Sintomático con signos de alarma con comorbilidades
-													</v-card-text>
-												</v-card>
-											</v-col>
+													}" color="red darken-1" min-height="100">
+														<v-card-text>
+															<v-row justify="center" align="center" dense no-gutters>
+																<v-col>
+																	<h1>E</h1>
+																</v-col>
+																<v-col v-if="paciente.id_clasificacion == 1" align="end">
+																	<v-icon x-large>
+																		mdi-check
+																	</v-icon>
+																</v-col>
+															</v-row>
+														</v-card-text>
+														<v-card-text class="pt-0 mt-0">
+															Sintomático con signos de alarma con comorbilidades
+														</v-card-text>
+													</v-card>
+												</v-col>
+											</v-row>
+												
 
+											<v-row class="mt-4" v-if="mostrar_contactos">
+												<v-col cols="12">
+													<v-card min-height="200">
+														<v-toolbar>
+															<span class="headline">Contactos</span>
+															<v-card-text v-if="usuario">
+																<v-btn
+																	absolute
+																	dark
+																	fab
+																	center
+																	right
+																	color="primary"
+																	@click="mostrar_registro_contacto()"
+																>
+																<v-icon>mdi-plus</v-icon>
+																</v-btn>
+																
+															</v-card-text>
+														</v-toolbar>
+
+														<!-- <v-card-text >
+															<v-alert
+																v-model="contacto_saved"
+																outlined
+																type="success"
+																text
+																dismissible
+																class="mt-4"
+															>
+																Excelente la tabla de contactos del paciente a sido actualizada.
+															</v-alert>
+														</v-card-text> -->
+														<v-card-text v-if="form_contacto">
+															<span class="subtitle-1" align="center">Agregar Nuevo Contacto</span>
+															<v-form class="mt-3" ref="form_contacto" v-model="valid_form_contacto">
+																<v-row>
+																	<v-col cols="4">
+																		<v-text-field v-model="contacto.nombre" autocomplete="off" label="Nombre" hide-details outlined :rules="[v => !!v || 'Campo obligatorio!']" required></v-text-field>
+																	</v-col>
+																	<v-col cols="4">
+																		<v-text-field v-model="contacto.apellido" autocomplete="off" label="Apellido" hide-details outlined :rules="[v => !!v || 'Campo obligatorio!']" required></v-text-field>
+																	</v-col>
+																	<v-col cols="4">
+																		<v-text-field v-model="contacto.telefono" autocomplete="off" :rules="[v => !!v || 'Campo obligatorio!']" label="Teléfono" hide-details outlined  required></v-text-field>
+																	</v-col>
+																	<v-col cols="4">
+																		<v-text-field v-model="contacto.parentesco" autocomplete="off" label="Parentesco" hide-details outlined  required></v-text-field>
+																	</v-col>
+																	<v-col cols="8">
+																		<v-text-field v-model="contacto.direccion" autocomplete="off" label="Dirección" hide-details outlined  required></v-text-field>
+																	</v-col>
+																</v-row>
+																<v-row>
+																	<v-col align="center">
+																		<v-btn @click="form_contacto = false" color="secondary">
+																			<v-icon>mdi-close-circle</v-icon>
+																		</v-btn>
+																		<v-btn @click="!edit_contacto ? agregar_contacto() : form_contacto = false" color="success" class="ml-2">
+																			<v-icon>mdi-content-save</v-icon>
+																		</v-btn>
+																	</v-col>
+																</v-row>
+															</v-form>
+															<v-divider class="mt-4"></v-divider>
+														</v-card-text>
+														
+														<v-card-text class="mt-2">
+															<v-data-table :items="paciente.contactos" :headers="headers_tabla_contactos" hide-default-footer>
+																<template v-slot:item.nombre_completo="{ item }">
+																	{{ item.nombre }} {{ item.apellido }}
+																</template>
+																<template v-slot:item.accion="{ item }">
+																	<v-btn 
+																		tile icon small color="error"
+																		@click="eliminar_contacto(item)"
+																	>
+																		<v-icon dark>mdi-delete</v-icon>
+																	</v-btn>
+
+																	<v-btn @click="editar_contacto(item)" class="ml-3" tile icon  small color="primary">
+																		<v-icon dark>mdi-pencil</v-icon>
+																	</v-btn>
+																	
+																</template>
+															</v-data-table>
+														</v-card-text>
+													</v-card>
+												</v-col>
+											</v-row>
 										</v-row>
 									</v-form>
 
 								</v-tab-item>
+
+								<!-- Bítacora de Consulta -->
+
 								<v-tab-item :key="1">
 									<v-row align="center">
 										<v-col cols="12" sm="6" md="5">
@@ -394,6 +493,18 @@
 
 															</v-col>
 
+															<v-col cols="12" sm="6" md="6">
+
+																<v-checkbox v-model="reporte.requiere_constancia" hide-details class="mx-2 pt-0 mt-0" label="Requiere Constancia"></v-checkbox>
+
+															</v-col>
+
+															<v-col cols="12" sm="6" md="6">
+
+																<v-checkbox v-model="reporte.requiere_prueba" hide-details class="mx-2 pt-0 mt-0" label="Requiere Prueba de Antígeno COVID-19"></v-checkbox>
+
+															</v-col>
+
 															<v-col cols="12" sm="12" md="12">
 
 																<v-textarea v-model="reporte.otro_diagnostico" rows="3" autocomplete="off" label="Otro Diagnóstico" hide-details outlined required></v-textarea>
@@ -438,35 +549,47 @@
 																	</v-col>
 																	<v-col cols="12" sm="6" md="6">
 																		<h3>Requiere medicamento</h3>
-																		<v-radio-group :disabled="!reporte.edit" v-model="reporte.requiere_medicamento" row>
+																		<v-radio-group :readonly="!reporte.edit" v-model="reporte.requiere_medicamento" row>
 																			<v-radio label="Si" value="S"></v-radio>
 																			<v-radio label="No" value="N"></v-radio>
 																		</v-radio-group>
 																	</v-col>
 																	<v-col>
-																		<v-textarea :disabled="!reporte.edit" v-if="reporte.requiere_medicamento == 'N'" v-model="reporte.razon_no_medicamento" rows="3" autocomplete="off" label="Razón por la que no hay prescripción médica" hide-details outlined required></v-textarea>
+																		<v-textarea :readonly="!reporte.edit" v-if="reporte.requiere_medicamento == 'N'" v-model="reporte.razon_no_medicamento" rows="3" autocomplete="off" label="Razón por la que no hay prescripción médica" hide-details outlined required></v-textarea>
 																	</v-col>
 																	<v-col cols="12" sm="6" md="6">
-																		<v-textarea :disabled="!reporte.edit" v-model="reporte.medicamento" rows="3" autocomplete="off"  label="Medicamento" hide-details outlined required></v-textarea>
+																		<v-textarea :readonly="!reporte.edit" v-model="reporte.medicamento" rows="3" autocomplete="off"  label="Observación" hide-details outlined required></v-textarea>
 																	</v-col>
 																	<v-col cols="12" sm="6" md="6">
-																		<v-textarea :disabled="!reporte.edit" v-model="reporte.observacion" rows="3" autocomplete="off" label="Observación" hide-details outlined required></v-textarea>
+																		<v-textarea :readonly="!reporte.edit" v-model="reporte.observacion" rows="3" autocomplete="off" label="Indicaciones" hide-details outlined required></v-textarea>
 																	</v-col>
 																	<v-col cols="12" sm="6" md="6">
 
-																		<v-checkbox :disabled="!reporte.edit" v-model="reporte.kit_medicamento" hide-details class="mx-2 pt-0 mt-0" label="Requiere entrega de kit de medicamento"></v-checkbox>
+																		<v-checkbox :readonly="!reporte.edit" v-model="reporte.kit_medicamento" hide-details class="mx-2 pt-0 mt-0" label="Requiere entrega de kit de medicamento"></v-checkbox>
 
 																	</v-col>
 
 																	<v-col cols="12" sm="6" md="6">
 
-																		<v-checkbox :disabled="!reporte.edit" v-model="reporte.requiere_azitromicina" hide-details class="mx-2 pt-0 mt-0" label="Requiere Azitromicina"></v-checkbox>
+																		<v-checkbox :readonly="!reporte.edit" v-model="reporte.requiere_azitromicina" hide-details class="mx-2 pt-0 mt-0" label="Requiere Azitromicina"></v-checkbox>
+
+																	</v-col>
+
+																	<v-col cols="12" sm="6" md="6">
+
+																		<v-checkbox :readonly="!reporte.edit" v-model="reporte.requiere_constancia" hide-details class="mx-2 pt-0 mt-0" label="Requiere Constancia"></v-checkbox>
+
+																	</v-col>
+
+																	<v-col cols="12" sm="6" md="6">
+
+																		<v-checkbox :readonly="!reporte.edit" v-model="reporte.requiere_prueba" hide-details class="mx-2 pt-0 mt-0" label="Requiere Prueba de Antígeno COVID-19"></v-checkbox>
 
 																	</v-col>
 
 																	<v-col cols="12" sm="12" md="12">
 
-																		<v-textarea :disabled="!reporte.edit" v-model="reporte.otro_diagnostico" rows="3" autocomplete="off" label="Otro Diagnóstico" hide-details outlined required></v-textarea>
+																		<v-textarea :readonly="!reporte.edit" v-model="reporte.otro_diagnostico" rows="3" autocomplete="off" label="Otro Diagnóstico" hide-details outlined required></v-textarea>
 
 																	</v-col>
 
@@ -598,7 +721,8 @@
 				frecuencia_cardiaca: "",
 				frecuencia_respiratoria: "",
 				saturacion_oxigeno: "",
-				edad_meses: ""
+				edad_meses: "",
+				contactos: []
 			},
 			zonas: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,21,24,25],
 			bitacora: [],
@@ -613,7 +737,20 @@
 			categorias: [],
 			clasificacion: [],
 			colonias: [],
-			isSaving: false
+			isSaving: false,
+			form_contacto: false,
+			valid_form_contacto: true,
+			contacto: {
+				nombre: "",
+				apellido: "",
+				telefono: "",
+				direccion: "",
+				parentesco: ""
+			},
+			headers_tabla_contactos: [],
+			contacto_saved: false,
+			edit_contacto: false,
+			mostrar_contactos: false
 		}),
 		methods:{
 
@@ -667,6 +804,13 @@
                 .then((response) => {
 
 					this.categorias = response.data
+
+				})
+				
+				this.axios.get(process.env.VUE_APP_API_URL + 'encabezado_tabla_contactos.php')
+                .then((response) => {
+
+					this.headers_tabla_contactos = response.data
 
                 })
 
@@ -902,6 +1046,58 @@
 					this.colonias = response.data
 				})
 
+			},
+			agregar_contacto(){
+
+				this.$refs.form_contacto.validate()
+
+				if (this.valid_form_contacto) {
+
+					this.contacto.index = this.paciente.contactos.length
+
+					this.paciente.contactos.push(this.contacto)
+					this.form_contacto = false
+					this.contacto_saved = true
+
+				}
+				
+			},
+			mostrar_registro_contacto(){
+				this.form_contacto = true
+				this.edit_contacto = false
+				this.contacto = {
+					nombre: "",
+					apellido: "",
+					telefono: "",
+					direccion: "",
+					parentesco: ""
+				}
+			},
+			eliminar_contacto(item){
+
+				Swal.fire({
+					title: '¿Está seguro?',
+					text: "Una vez eliminado no lo podrá recuperar!",
+					icon: 'warning',
+					showCancelButton: true,
+					confirmButtonColor: '#3085d6',
+					cancelButtonColor: '#d33',
+					confirmButtonText: 'Si, ELIMINAR!',
+					cancelButtonText: 'Cancelar'
+					})
+				.then((result) => {
+					if (result.value) {
+						this.paciente.contactos.splice(item.index, 1)
+					}
+				})
+
+			},
+			editar_contacto(item){
+
+				this.edit_contacto = true
+				this.form_contacto = true
+				this.contacto = item
+
 			}
 
 		},
@@ -924,6 +1120,46 @@
 					}
 
 				}
+
+			},
+			paciente: {
+				// eslint-disable-next-line no-unused-vars
+				handler(val){
+
+					val.categorias = this.categorias
+
+					this.axios.post(process.env.VUE_APP_API_URL + 'verificar_aplica_contactos.php', val)
+					// eslint-disable-next-line no-unused-vars
+					.then((response) => {
+						console.log(response.data);
+						this.mostrar_contactos = response.data
+					})
+
+				},
+				deep: true
+			},
+			categorias: {
+
+				handler(val){
+
+					if (val) {
+						
+						let paciente = {}
+						paciente = this.paciente
+						paciente.categorias = this.categorias
+
+						this.axios.post(process.env.VUE_APP_API_URL + 'verificar_aplica_contactos.php', paciente)
+						// eslint-disable-next-line no-unused-vars
+						.then((response) => {
+							console.log(response.data);
+							this.mostrar_contactos = response.data
+						})
+
+					}
+					
+
+				},
+				deep: true
 
 			}
 		}

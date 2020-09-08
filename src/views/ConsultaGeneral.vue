@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-container>
+        <v-container fluid>
             <v-row align="center" v-if="usuario">
                 <v-col col="12" sm="6" md="4">
                     <v-text-field v-model="busqueda" outlined label="Buscar" append-icon="mdi-magnify" type="text" autocomplete="off" hide-details dense></v-text-field>

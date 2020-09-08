@@ -73,6 +73,35 @@
       </v-card>
     </v-dialog>
 
+	<v-dialog
+      v-model="dialog_aprobacion"
+      max-width="290"
+    >
+      <v-card>
+        <v-card-title class="headline">Aprobación de Cuenta</v-card-title>
+
+        <v-card-text>
+			
+			Su cuenta se encuentra pendiente de aprobación o bien a sido rechazada. Por favor ponerse en contacto con el personal de AVE.
+
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn
+            color="gray darken-1"
+            text
+            @click="dialog_aprobacion = false"
+          >
+            Cerrar
+          </v-btn>
+
+          
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
 	</div>
 	
 </template>
@@ -87,7 +116,8 @@
 				dialog: false,
 				sendingMail: false,
 				usuario_registrado: {},
-				mailSend: false
+				mailSend: false,
+				dialog_aprobacion: false
 			}
 		},   
 		methods: {
@@ -108,7 +138,7 @@
 
 						}else{
 
-							if (response.data.verificada) {
+							if (response.data.verificada && response.data.aprobada) {
 								
 								console.log(response.data)
 
@@ -119,9 +149,26 @@
 
 							}else{
 
-								this.usuario_registrado = response.data
+								if (response.data.aprobada != 'S') {
+									
+									this.usuario_registrado = response.data
 
-								this.dialog = true
+									this.dialog_aprobacion = true
+
+									return
+
+								}
+
+								if (!response.data.verificada) {
+									
+									this.usuario_registrado = response.data
+
+									this.dialog = true
+
+									return
+
+								}
+								
 
 							}
 
