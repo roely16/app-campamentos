@@ -14,6 +14,9 @@ import CuentaAceptada from '../views/CuentaAceptada.vue'
 import CuentaRechazada from '../views/CuentaRechazada.vue'
 import Pruebas from '../views/Pruebas'
 
+// Entrega de medicamentos Doctor Presencial
+import EntregaKit from '../views/EntregaKit'
+
 // Privado
 import ConsultaPrivado from '../views/Consulta_Privado'
 import PretriajePrivado from '../views/Pretriaje_Privado'
@@ -85,6 +88,11 @@ Vue.use(VueRouter)
 				path: '/home/pruebas',
 				name: 'pruebas',
 				component: Pruebas,
+			},
+			{
+				path: '/home/entrega_kit',
+				name: 'entrega_kit',
+				component: EntregaKit,
 			},
 			// Privado
 			{

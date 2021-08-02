@@ -38,6 +38,10 @@
 
                                 <v-text-field :rules="[v => !!v || 'Campo obligatorio!']" v-model="nuevo_usuario.telefono" outlined label="Telefono" prepend-icon="mdi-phone" type="text" autocomplete="off"></v-text-field>
 
+                                <v-text-field :rules="[v => !!v || 'Campo obligatorio!']" v-model="nuevo_usuario.password" outlined label="Contraseña" prepend-icon="mdi-lock" :append-icon="!show_password ? 'mdi-eye' : 'mdi-eye-off'" :type="show_password ? 'text' : 'password'" @click:append="show_password = !show_password" autocomplete="off"></v-text-field>
+
+                                <v-text-field :rules="[v => !!v || 'Campo obligatorio!']" v-model="nuevo_usuario.repite_password" outlined label="Repite Contraseña" prepend-icon="mdi-lock" :append-icon="!show_repite_password ? 'mdi-eye' : 'mdi-eye-off'" :type="show_repite_password ? 'text' : 'password'" @click:append="show_repite_password = !show_repite_password" autocomplete="off"></v-text-field>
+
                                 <v-text-field :rules="[v => !!v || 'Campo obligatorio!']" v-model="nuevo_usuario.email" outlined label="Email" prepend-icon="mdi-email" type="email" autocomplete="off"></v-text-field>
 
                                 <v-divider class="mb-5"></v-divider>
@@ -117,6 +121,7 @@
 <script>
 
     import Terminos from '@/components/Login/Terminos.vue'
+    import Swal from 'sweetalert2'
 
     export default {
         components: {
@@ -135,7 +140,9 @@
                 message: null,
                 status: null,
                 privado: false,
-                empresas: []
+                empresas: [],
+                show_password: false,
+                show_repite_password: false
             }
         },
         methods: {
@@ -155,21 +162,32 @@
 
                 if (this.valid_form) {
                     
-                    this.registrando = true
+                    if (this.nuevo_usuario.password == this.nuevo_usuario.repite_password) {
+                        
+                        this.registrando = true
 
-                    console.log(this.nuevo_usuario);
+                        console.log(this.nuevo_usuario);
 
-                    this.axios.post(process.env.VUE_APP_API_URL + 'registro.php', this.nuevo_usuario)
-                    .then((response) => {
+                        this.axios.post(process.env.VUE_APP_API_URL + 'registro.php', this.nuevo_usuario)
+                        .then((response) => {
 
-                        console.log(response.data)
+                            this.dialog = true
+                            this.registrando = false
 
-                        this.dialog = true
-                        this.registrando = false
+                            this.message = response.data.message
+                            this.status = response.data.status
+                        })
 
-                        this.message = response.data.message
-                        this.status = response.data.status
-                    })
+                    }else{
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error...',
+                            text: 'Ambas contraseñas deben de coincidir!',
+                        })
+
+
+                    }
 
                 }
                 

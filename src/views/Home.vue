@@ -82,24 +82,76 @@
 		<v-dialog v-model="mostrar_configuracion" max-width="400">
 		
 			<v-card>
-				<v-card-title class="headline">Configuración</v-card-title>
-				<v-card-text>
-					<v-col class="d-flex" cols="12">
-						<v-select
-							v-model="campamento.id"
-							:items="campamentos"
-							label="Campamentos"
-							item-text="nombre" item-value="id"
-							hide-details
-							outlined
-						></v-select>
-					</v-col>
-				</v-card-text>
-				<v-card-actions>
-					<v-spacer></v-spacer>
-					<v-btn color="green darken-1" text @click="mostrar_configuracion = false">Cancelar</v-btn>
-					<v-btn color="green darken-1" text @click="dialog = cambiar_campamento()">Aceptar</v-btn>
-				</v-card-actions>
+
+				<v-tabs>
+					<v-tab>
+						<v-icon>mdi-account-cog</v-icon>
+					</v-tab>
+					<v-tab>
+						<v-icon>
+							mdi-lock-open
+						</v-icon>
+					</v-tab>
+
+					<v-tab-item>
+						
+						<v-card-title class="headline">Configuración</v-card-title>
+						<v-card-text>
+							<v-col class="d-flex" cols="12">
+								<v-select
+									v-model="campamento.id"
+									:items="campamentos"
+									label="Campamentos"
+									item-text="nombre" item-value="id"
+									hide-details
+									outlined
+								></v-select>
+							</v-col>
+						</v-card-text>
+
+						<v-card-actions>
+							<v-spacer></v-spacer>
+							<v-btn color="green darken-1" text @click="mostrar_configuracion = false">Cancelar</v-btn>
+							<v-btn color="green darken-1" text @click="dialog = cambiar_campamento()">Aceptar</v-btn>
+						</v-card-actions>
+
+					</v-tab-item>
+
+					<v-tab-item>
+						
+						<v-card-title class="headline">
+							Cambiar Contraseña
+						</v-card-title>
+
+						<v-card-text>
+							<v-form ref="form_cambio" v-model="valid_form_cambio">
+								<v-col class="d-flex" cols="12">
+									<v-text-field :rules="[v => !!v || 'Campo obligatorio!']" v-model="pass.actual" outlined label="Actual Contraseña" :append-icon="!pass.show_actual ? 'mdi-eye' : 'mdi-eye-off'" :type="pass.show_actual ? 'text' : 'password'" @click:append="pass.show_actual = !pass.show_actual" hide-details autocomplete="off"></v-text-field>
+								</v-col>
+
+								<v-col class="d-flex" cols="12">
+									<v-text-field :rules="[v => !!v || 'Campo obligatorio!']" v-model="pass.nueva" outlined label="Nueva Contraseña" :append-icon="!pass.show_nueva ? 'mdi-eye' : 'mdi-eye-off'" :type="pass.show_nueva ? 'text' : 'password'" @click:append="pass.show_nueva = !pass.show_nueva" hide-details autocomplete="off"></v-text-field>
+								</v-col>
+
+								<v-col class="d-flex" cols="12">
+									<v-text-field :rules="[v => !!v || 'Campo obligatorio!']" v-model="pass.repite_nueva" outlined label="Repite Nueva Contraseña" :append-icon="!pass.show_repite_nueva ? 'mdi-eye' : 'mdi-eye-off'" :type="pass.show_repite_nueva ? 'text' : 'password'" @click:append="pass.show_repite_nueva = !pass.show_repite_nueva" hide-details autocomplete="off"></v-text-field>
+								</v-col>
+							</v-form>
+
+						</v-card-text>
+
+						<v-card-actions>
+							<v-spacer></v-spacer>
+							<v-btn color="green darken-1" text @click="mostrar_configuracion = false">Cancelar</v-btn>
+							<v-btn color="green darken-1" text @click="dialog = cambiar_password()">Aceptar</v-btn>
+						</v-card-actions>
+
+					</v-tab-item>
+				</v-tabs>
+
+				
+
+
 			</v-card>
 		</v-dialog>
 
@@ -122,7 +174,16 @@ export default {
 		menu: [],
 		campamentos: [],
 		mostrar_configuracion: false,
-		campamento: {}
+		campamento: {},
+		pass: {
+			actual: null,
+			show_actual: false,
+			nueva: null,
+			show_nueva: false,
+			repite_nueva: null,
+			show_repite_nueva: false
+		},
+		valid_form_cambio: true
 	}),
 	methods: {
 		obtener_menu(){
@@ -196,6 +257,62 @@ export default {
 				
 			})
 			
+
+		},
+		cambiar_password(){
+
+			this.$refs.form_cambio.validate()
+
+			if (this.valid_form_cambio) {
+				
+				if (this.pass.nueva == this.pass.repite_nueva) {
+
+					// Verificar que la clave actual sea correcta, si lo es actualizar
+
+					let usuario = JSON.parse(localStorage.getItem('usuario-campamentos'))
+
+					this.pass.id_usuario = usuario.id
+
+					this.axios
+					.post(process.env.VUE_APP_API_URL + 'actualizar_password.php', this.pass)
+					.then((response) => {
+						console.log(response.data)
+
+						if (response.data.status == 200) {
+							
+							Swal.fire(
+								'Excelente!',
+								'Se ha actualizado la contraseña exitosamente.  Deberá inicar sesión de nuevo',
+								'success'
+							).then(() => {
+
+								this.mostrar_configuracion = false
+								this.salir()
+
+							})
+
+						}else{
+
+							Swal.fire({
+								icon: 'error',
+								title: 'Error...',
+								text: response.data.message,
+							})
+
+						}
+					})
+
+				}else{
+
+					Swal.fire({
+						icon: 'error',
+						title: 'Error...',
+						text: 'La nueva contraseñas debe de coincidir!',
+					})
+
+				}
+
+			}
 
 		},
 		campamentos_configuracion(){

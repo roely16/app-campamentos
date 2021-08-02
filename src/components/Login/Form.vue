@@ -3,8 +3,11 @@
 	<v-row align="center" justify="center">
 		<v-col xs="12" md="6" sm="8" lg="12">
 			<v-form ref="login_form" v-model="valid_form" justify="center">
+				
 				<v-text-field v-model="usuario.telefono" :rules="[v => !!v || 'Campo obligatorio!']" dark outlined label="Usuario" prepend-icon="mdi-account" type="text" autocomplete="off"></v-text-field>
-				<!-- <v-text-field dark outlined label="Contraseña" prepend-icon="mdi-lock" type="password"></v-text-field> -->
+
+				<v-text-field :rules="[v => !!v || 'Campo obligatorio!']" dark outlined label="Contraseña" prepend-icon="mdi-lock" v-model="usuario.password" :append-icon="!show_password ? 'mdi-eye' : 'mdi-eye-off'" :type="show_password ? 'text' : 'password'" @click:append="show_password = !show_password"></v-text-field>
+
 				<v-row dense class="text-center">
 					<v-col>
 						<v-btn @click="login" dark x-large color="success">Aceptar 
@@ -18,7 +21,7 @@
 				<v-row class="mt-6" justify="center" dense>
 					<v-col cols="10">
 						<v-alert class="text-center" v-if="loginError" dense type="error">
-							Teléfono Incorrecto.
+							Teléfono o Contraseña Incorrectos.
 						</v-alert>
 					</v-col>
 				</v-row>
@@ -117,7 +120,8 @@
 				sendingMail: false,
 				usuario_registrado: {},
 				mailSend: false,
-				dialog_aprobacion: false
+				dialog_aprobacion: false,
+				show_password: false
 			}
 		},   
 		methods: {
@@ -127,11 +131,15 @@
 				
 				if (this.valid_form) {
 					
+					console.log(this.usuario);
+
 					this.loginError = false
 					this.mailSend = false
 
 					this.axios.post(process.env.VUE_APP_API_URL + 'login.php', this.usuario).then((response) => {
-						
+
+						console.log(response.data);
+
 						if (!response.data) {
 							
 							this.loginError = true

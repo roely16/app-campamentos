@@ -1,22 +1,18 @@
 <template>
     <div>
         <v-container fluid>
-            <v-row dense no-gutters align="center">
+            <v-row>
                 <v-col col="12" sm="6" md="4">
                     <v-text-field v-model="busqueda" outlined label="Buscar" append-icon="mdi-magnify" type="text" autocomplete="off" hide-details dense></v-text-field>
                 </v-col>
-                <v-col align="end">
+               <v-col align="end">
                     <h1 class="pb-0 mb-0" style="font-size: 3em">{{ items.length }}</h1>
                     <small class="font-weight-light mt-0 pt-0">Kits recomendados</small>
                 </v-col>
+                
             </v-row>
+
             <v-row>
-                <v-col cols="12">
-                    <v-tabs v-model="tab" background-color="blue accent-4" show-arrows dark>
-                        <v-tab @click="obtener_pacientes(campamento.id)" v-for="(campamento, index) in campamentos" :key="index">{{ campamento.nombre }} 
-                        </v-tab>
-                    </v-tabs>
-                </v-col>
                 <v-col cols="12">
                     <v-data-table
                         :headers="headers"
@@ -27,6 +23,7 @@
                         :search="busqueda"
                         :page.sync="page"
                         @page-count="pageCount = $event"
+                        :loading="loading"
                     >
                         <template v-slot:[`item.nombre`]="{ item }">
                             {{ item.nombre.toUpperCase() }} {{ item.segundo_nombre.toUpperCase() }} {{ item.apellido.toUpperCase() }} {{ item.segundo_apellido.toUpperCase() }}
@@ -69,6 +66,7 @@
                         </template>
 
                     </v-data-table>
+
                 </v-col>
                 <v-col cols="12">
                     <v-pagination
@@ -130,7 +128,7 @@
             obtener_detalle = false
             id_paciente = null
             show_dialog = false}" />
-        
+
         </v-container>
     </div>
 </template>
@@ -142,7 +140,7 @@
 
     export default {
         components: {
-            Form,
+            Form
         },
         data(){
             return{
@@ -164,30 +162,30 @@
                 usuario: null,
                 show_dialog: false,
                 obtener_detalle: false,
+                id_paciente: null,
+                loading: false
             }
         },
         methods: {
 
-            obtener_campamentos(){
+            obtener_pacientes(){
 
-                this.axios.get(process.env.VUE_APP_API_URL + 'datos_registro.php').then((response) => {
-                    this.campamentos = response.data.campamentos
-                })
+                this.loading = true
 
-            },
-            obtener_pacientes(id_campamento){
+                //this.campamento_select = this.usuario.id_campamento
 
-                this.campamento_select = id_campamento
+                let usuario = JSON.parse(localStorage.getItem('usuario-campamentos'))
 
                 let data = {
-                    id_campamento: id_campamento
+                    id_campamento: usuario.id_campamento
                 }
 
-                this.axios.post(process.env.VUE_APP_API_URL + 'obtener_farmacia.php', data)
+                this.axios.post(process.env.VUE_APP_API_URL + 'obtener_farmacia_doctor.php', data)
                 .then((response) => {
 
                     this.headers = response.data.headers
                     this.items = response.data.items
+                    this.loading = false
                     
                 })
 
@@ -198,38 +196,11 @@
                 this.paciente = paciente
 
             },
-            entregar(){
+            detalle(item){
 
-                this.$refs.form_entrega.validate()
-
-                if (this.valid_form) {
-
-                    let usuario = JSON.parse(localStorage.getItem('usuario-campamentos'))
-
-                    this.entrega_medicamento.id_paciente = this.paciente.id
-                    this.entrega_medicamento.id_persona_entrega_kit = usuario.id
-
-                    this.axios.post(process.env.VUE_APP_API_URL + 'entregar_kit.php', this.entrega_medicamento)
-                    .then((response) => {
-                        
-                        if (response.data) {
-                            
-                            Swal.fire(
-                                'Excelente!',
-                                'Se ha registrado la entrega del kit.',
-                                'success'
-                            ).then(() => {
-
-                                this.$refs.form_entrega.reset()
-                                this.obtener_pacientes(this.campamento_select)
-                                this.dialog = false
-
-                            })
-                        
-                        }
-                    })
-                    
-                }
+                this.obtener_detalle = true
+                this.id_paciente = item.id
+                this.show_dialog = true
 
             },
             detalle_usuario(){
@@ -259,23 +230,51 @@
                 })
 
             },
-            detalle(item){
+            entregar(){
 
-                this.obtener_detalle = true
-                this.id_paciente = item.id
-                this.show_dialog = true
+                this.$refs.form_entrega.validate()
+
+                if (this.valid_form) {
+
+                    let usuario = JSON.parse(localStorage.getItem('usuario-campamentos'))
+
+                    this.entrega_medicamento.id_paciente = this.paciente.id
+                    this.entrega_medicamento.id_persona_entrega_kit = usuario.id
+
+                    this.axios.post(process.env.VUE_APP_API_URL + 'entregar_kit_doctor.php', this.entrega_medicamento)
+                    .then((response) => {
+                        
+                        if (response.data) {
+                            
+                            Swal.fire(
+                                'Excelente!',
+                                'Se ha registrado la entrega del kit.',
+                                'success'
+                            ).then(() => {
+
+                                this.$refs.form_entrega.reset()
+                                this.obtener_pacientes(this.campamento_select)
+                                this.dialog = false
+
+                            })
+                        
+                        }
+                    })
+                    
+                }
 
             },
+
         },
-        mounted(){
+        created(){
 
             let usuario = JSON.parse(localStorage.getItem('usuario-campamentos'))
             this.tab = usuario.id_campamento - 1
             this.campamento_select = usuario.id_campamento
 
             this.detalle_usuario()
-            this.obtener_campamentos()
-            this.obtener_pacientes(this.campamento_select)
+            
+            this.obtener_pacientes()
 
             this.$nextTick(function () {
                 window.setInterval(() => {
@@ -286,3 +285,7 @@
         }
     }
 </script>
+
+<style>
+
+</style>

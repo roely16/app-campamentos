@@ -3,7 +3,23 @@
         <v-container fluid>
             <v-row align="center" v-if="usuario">
                 <v-col col="12" sm="6" md="4">
-                    <v-text-field v-model="busqueda" outlined label="Buscar" append-icon="mdi-magnify" type="text" autocomplete="off" hide-details dense></v-text-field>
+                    <v-row>
+                        <v-col cols="8">
+                            <v-text-field v-model="busqueda" outlined label="Buscar" append-icon="mdi-magnify" type="text" autocomplete="off" hide-details dense></v-text-field>
+                        </v-col>
+                        <v-col>
+                            <v-select
+                                :items="years"
+                                label="Año"
+                                outlined
+                                hide-details dense
+                                v-model="year_filtro"
+                                @change="obtener_pacientes()"
+                            ></v-select>
+                        </v-col>
+                    </v-row>
+                    
+
                 </v-col>
                 <v-col v-if="usuario.agregar_paciente" align="end" col="12" sm="6" md="8">
                     <v-btn  @click="show_dialog = true" dark color="blue darken-4">
@@ -240,7 +256,10 @@
                 campamento_filtrado: null,
                 campamentos: [],
                 id_campamento_filtrado: null,
-                show_dialog_medico: false
+                show_dialog_medico: false,
+                years: [2021, 2020],
+                year_filtro: 2021,
+                loading: false
 
             }
         },
@@ -250,6 +269,7 @@
 
                 let usuario = JSON.parse(localStorage.getItem('usuario-campamentos'))
                 usuario.id_campamento_filtrado = this.id_campamento_filtrado
+                usuario.year_filtro = this.year_filtro
 
                 this.axios.post(process.env.VUE_APP_API_URL + 'obtener_pacientes.php', usuario)
                 .then((response) => {
