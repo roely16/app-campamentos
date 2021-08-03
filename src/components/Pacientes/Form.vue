@@ -209,7 +209,10 @@
 												<v-divider></v-divider>
 											</v-col>
 
-											<v-col v-if="paciente.vacunado" cols="12" sm="6" md="12">
+											<v-col v-if="paciente.vacunado" cols="12" sm="6" md="6">
+												<v-select :items="vacunas" item-text="nombre" item-value="id" placeholder="Seleccione una vacuna de la lista" v-model="paciente.vacuna_id" hide-details outlined label="Vacuna"></v-select>
+											</v-col>
+											<!-- <v-col v-if="paciente.vacunado" cols="12" sm="6" md="12">
 												<v-checkbox @change="() => {
 
 													if(paciente.astrazeneca){
@@ -233,7 +236,7 @@
 													}
 
 												}" :disabled="!usuario.editar_paciente" v-model="paciente.sputnik_v" hide-details class="mx-2 mt-0" label="Sputnik V"></v-checkbox>
-											</v-col>
+											</v-col> -->
 
 											<v-col v-if="paciente.vacunado" cols="12" sm="6" md="12">
 												<v-checkbox @change="() => {
@@ -242,14 +245,15 @@
 
 														paciente.astrazeneca = false
 														paciente.sputnik_v = false
+														paciente.vacuna_id = null
 
 													}
 
-												}" :disabled="!usuario.editar_paciente" v-model="paciente.otra_vacuna_check" hide-details class="mx-2 mt-0" label="Otras"></v-checkbox>
+												}" :disabled="!usuario.editar_paciente" v-model="paciente.otra_vacuna_check" hide-details class="mx-2 mt-0" label="Otra Vacuna"></v-checkbox>
 											</v-col>
 
 											<v-col v-if="paciente.vacunado" cols="12" sm="6" md="6">
-												<v-textarea outlined rows="2" :disabled="!usuario.editar_paciente || !paciente.otra_vacuna_check" v-model="paciente.otra_vacuna" hide-details class="mx-2 mt-0" label="Especifique"></v-textarea>
+												<v-textarea outlined rows="2" :disabled="!usuario.editar_paciente || !paciente.otra_vacuna_check" v-model="paciente.otra_vacuna" hide-details class="mt-0" label="Especifique"></v-textarea>
 											</v-col>
 
 
@@ -803,7 +807,8 @@
 				astrazeneca: false,
 				sputnik_v: false,
 				otra_vacuna_check: false,
-				otra_vacuna: null
+				otra_vacuna: null,
+				vacuna_id: null
 			},
 			zonas: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,21,24,25],
 			bitacora: [],
@@ -831,7 +836,8 @@
 			headers_tabla_contactos: [],
 			contacto_saved: false,
 			edit_contacto: false,
-			mostrar_contactos: false
+			mostrar_contactos: false,
+			vacunas: []
 		}),
 		methods:{
 
@@ -874,7 +880,15 @@
 					frecuencia_cardiaca: "",
 					frecuencia_respiratoria: "",
 					saturacion_oxigeno: "",
-					edad_meses: ""
+					edad_meses: "",
+					contactos: [],
+					vacunado: false,
+					esquema_completo: false,
+					astrazeneca: false,
+					sputnik_v: false,
+					otra_vacuna_check: false,
+					otra_vacuna: null,
+					vacuna_id: null
 				}
 				this.$emit('closeDialog')
 
@@ -956,8 +970,6 @@
 			},
 			editar_paciente(){
 
-				console.log(this.paciente);
-
 				this.$refs.form_paciente.validate()
 
 				if (this.valid_form) {
@@ -967,6 +979,8 @@
 					this.axios.post(process.env.VUE_APP_API_URL + 'editar_paciente.php', this.paciente)
 					.then((response) => {
 						
+						console.log(response.data)
+
 						Swal.fire({
 							title: response.data.title,
 							html: response.data.message,
@@ -1181,12 +1195,23 @@
 				this.form_contacto = true
 				this.contacto = item
 
+			},
+			obtener_vacunas(){
+
+				this.axios.get(process.env.VUE_APP_API_URL + 'obtener_vacunas.php')
+                .then((response) => {
+
+					this.vacunas = response.data
+
+				})
+
 			}
 
 		},
 		mounted(){
 			
 			//this.obtener_clasificacion()
+			this.obtener_vacunas()
 			this.obtener_sintomas()
 
 		},
