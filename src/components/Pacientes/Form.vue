@@ -2,14 +2,14 @@
     <div>
         <v-row justify="center">
 			<v-dialog fullscreen hide-overlay v-model="show_dialog" @click:outside="closeDialog()">
-				
+
 				<v-card>
 					<v-toolbar dark color="blue darken-4">
 						<v-btn icon dark @click="closeDialog()">
 							<v-icon>mdi-close</v-icon>
 						</v-btn>
 						<v-toolbar-title>
-							{{ obtener_detalle ? 'DETALLE PACIENTE ' + paciente.correlativo : 'NUEVO PACIENTE' }} 
+							{{ obtener_detalle ? 'DETALLE PACIENTE ' + paciente.correlativo : 'NUEVO PACIENTE' }}
 						</v-toolbar-title>
 						<v-spacer></v-spacer>
 						<v-toolbar-items v-if="usuario">
@@ -18,7 +18,7 @@
 							</v-btn>
 						</v-toolbar-items>
 					</v-toolbar>
-					
+
 					<v-card-text>
 						<v-container>
 							<v-tabs v-if="usuario" class="mb-2" v-model="tab">
@@ -101,7 +101,7 @@
 														></v-text-field>
 													</template>
 													<v-date-picker v-model="paciente.fecha_nacimiento" no-title @input="menu = false" scrollable>
-														
+
 													</v-date-picker>
 												</v-menu>
 											</v-col>
@@ -119,11 +119,11 @@
 											<v-col cols="12" sm="6" md="6">
 												<v-text-field :disabled="!usuario.editar_paciente" autocomplete="off" v-model="paciente.numero_contacto" type="number" label="Número de contacto telefónico" hide-details outlined></v-text-field>
 											</v-col>
-											
+
 											<v-col cols="12" sm="6" md="6">
 												<v-text-field :disabled="!usuario.editar_paciente" autocomplete="off" v-model="paciente.toma_temperatura" type="number" label="Toma de temperatura" hide-details outlined></v-text-field>
 											</v-col>
-											
+
 											<v-col cols="12">
 												<span class="headline">Datos de Dirección</span>
 												<v-divider></v-divider>
@@ -240,7 +240,7 @@
 
 											<v-col v-if="paciente.vacunado" cols="12" sm="6" md="12">
 												<v-checkbox @change="() => {
-													
+
 													if(paciente.otra_vacuna_check){
 
 														paciente.astrazeneca = false
@@ -312,7 +312,7 @@
 														</v-col>
 													</v-row>
 												</v-col>
-												
+
 												<v-col v-for="verificacion in categoria.verificaciones" :key="verificacion.id" cols="12" sm="6" md="6">
 													<v-row align="center" dense no-gutters>
 														<v-col cols="10">
@@ -331,9 +331,9 @@
 															</v-textarea>
 														</v-col>
 													</v-row>
-													
+
 												</v-col>
-												
+
 											</v-row>
 
 											<v-row>
@@ -346,7 +346,7 @@
 												</v-col>
 												<v-col cols="4" sm="6" md="4">
 													<v-card :flat="!paciente.id_clasificacion" :elevation="paciente.id_clasificacion == 1 ? 10 : null" @click="() => {
-														
+
 														if(usuario.editar_paciente){
 
 															if(paciente.id_clasificacion == 1){
@@ -359,7 +359,7 @@
 
 															}
 
-														}	
+														}
 
 													}" color="red darken-1" min-height="100">
 														<v-card-text>
@@ -380,7 +380,7 @@
 													</v-card>
 												</v-col>
 											</v-row>
-												
+
 
 											<v-row class="mt-4" v-if="mostrar_contactos">
 												<v-col cols="12">
@@ -399,7 +399,7 @@
 																>
 																<v-icon>mdi-plus</v-icon>
 																</v-btn>
-																
+
 															</v-card-text>
 														</v-toolbar>
 
@@ -448,14 +448,14 @@
 															</v-form>
 															<v-divider class="mt-4"></v-divider>
 														</v-card-text>
-														
+
 														<v-card-text class="mt-2">
 															<v-data-table :items="paciente.contactos" :headers="headers_tabla_contactos" hide-default-footer>
 																<template v-slot:[`item.nombre_completo`]="{ item }">
 																	{{ item.nombre }} {{ item.apellido }}
 																</template>
 																<template v-slot:[`item.accion`]="{ item }">
-																	<v-btn 
+																	<v-btn
 																		tile icon small color="error"
 																		@click="eliminar_contacto(item)"
 																	>
@@ -465,7 +465,7 @@
 																	<v-btn @click="editar_contacto(item)" class="ml-3" tile icon  small color="primary">
 																		<v-icon dark>mdi-pencil</v-icon>
 																	</v-btn>
-																	
+
 																</template>
 															</v-data-table>
 														</v-card-text>
@@ -487,7 +487,7 @@
 										<v-col cols="12" sm="6" md="7">
 											<v-text-field autocomplete="off" disabled v-model="paciente.nombre_completo" label="Nombre" hide-details outlined required></v-text-field>
 										</v-col>
-										
+
 									</v-row>
 
 									<v-row>
@@ -512,7 +512,7 @@
 														</v-card-text>
 													</v-card>
 												</v-col>
-												
+
 											</v-row>
 										</v-col>
 										<v-col cols="12" lg="7" md="7">
@@ -534,7 +534,7 @@
 														>
 														<v-icon>mdi-plus</v-icon>
 														</v-btn>
-														
+
 													</v-card-text>
 												</v-toolbar>
 
@@ -559,7 +559,7 @@
 															<v-col cols="12" sm="6" md="6">
 																<v-textarea v-model="reporte.medicamento" rows="3" autocomplete="off" label="Indicaciones" hide-details outlined required></v-textarea>
 															</v-col>
-															
+
 															<v-col cols="12" sm="6" md="6">
 
 																<v-checkbox v-model="reporte.kit_medicamento" hide-details class="mx-2 pt-0 mt-0" label="Requiere entrega de kit de medicamento"></v-checkbox>
@@ -568,7 +568,7 @@
 
 															<v-col cols="12" sm="6" md="6">
 
-																<v-checkbox v-model="reporte.requiere_azitromicina" hide-details class="mx-2 pt-0 mt-0" label="Requiere Azitromicina"></v-checkbox>
+																<v-checkbox :disabled="true" v-model="reporte.requiere_azitromicina" hide-details class="mx-2 pt-0 mt-0" label="Requiere Azitromicina"></v-checkbox>
 
 															</v-col>
 
@@ -607,9 +607,9 @@
 															</v-col>
 														</v-row>
 													</v-form>
-													
+
 													<v-divider class="mt-4"></v-divider>
-													
+
 												</v-card-text>
 
 												<!-- Reportes ingresados -->
@@ -650,7 +650,7 @@
 
 																	<v-col cols="12" sm="6" md="6">
 
-																		<v-checkbox :readonly="!reporte.edit" v-model="reporte.requiere_azitromicina" hide-details class="mx-2 pt-0 mt-0" label="Requiere Azitromicina"></v-checkbox>
+																		<v-checkbox :disabled="true" v-model="reporte.requiere_azitromicina" hide-details class="mx-2 pt-0 mt-0" label="Requiere Azitromicina"></v-checkbox>
 
 																	</v-col>
 
@@ -680,7 +680,7 @@
 																		</v-btn>
 
 																		<v-btn @click="() => {
-																			
+
 																			reporte.edit ? editar_reporte(reporte) : reporte.edit = true
 
 																		}" :color="reporte.edit ? 'success' : 'primary'" class="ml-2">
@@ -703,16 +703,16 @@
 											</v-card>
 										</v-col>
 									</v-row>
-									
+
 								</v-tab-item>
 							</v-tabs-items>
 						</v-container>
-						
+
 					</v-card-text>
 				</v-card>
 
 			</v-dialog>
-			
+
 			<v-dialog v-model="mensaje_registro" max-width="400">
 				<v-card>
 					<v-card-title class="headline">
@@ -901,7 +901,7 @@
 					this.categorias = response.data
 
 				})
-				
+
 				this.axios.get(process.env.VUE_APP_API_URL + 'encabezado_tabla_contactos.php')
                 .then((response) => {
 
@@ -914,32 +914,32 @@
 
 				this.axios.get(process.env.VUE_APP_API_URL + 'obtener_clasificacion.php')
                 .then((response) => {
-					
+
 					this.clasificacion = response.data
 
 				})
-				
+
 			},
 			registrar_paciente(){
 
 				this.$refs.form_paciente.validate()
 
 				if (this.valid_form) {
-					
+
 					this.isSaving = true
-					
+
 					let usuario = JSON.parse(localStorage.getItem('usuario-campamentos'))
 
 					this.paciente.id_campamento = usuario.id_campamento
 					this.paciente.registrado_por = usuario.id
 
 					this.paciente.categorias = this.categorias
-					
+
 					this.axios.post(process.env.VUE_APP_API_URL + 'registrar_paciente.php', this.paciente)
 					.then((response) => {
 
 						console.log(response.data);
-						
+
 						if (response.data.code == 200) {
 
 							Swal.fire({
@@ -961,7 +961,7 @@
 						}
 
 						this.isSaving = false
-						
+
 
 					})
 
@@ -978,7 +978,7 @@
 
 					this.axios.post(process.env.VUE_APP_API_URL + 'editar_paciente.php', this.paciente)
 					.then((response) => {
-						
+
 						console.log(response.data)
 
 						Swal.fire({
@@ -1005,7 +1005,7 @@
 
 				this.axios.post(process.env.VUE_APP_API_URL + 'detalle_paciente.php', data)
 				.then((response) => {
-					
+
 					this.paciente = response.data
 					this.categorias = response.data.categorias
 					this.bitacora = response.data.bitacora
@@ -1058,7 +1058,7 @@
 					confirmButtonText: 'Si, ELIMINAR',
 					cancelButtonText: 'Cancelar'
 				}).then((result) => {
-					
+
 					if (result.value) {
 
 						let data = {
@@ -1070,7 +1070,7 @@
 						.then((response) => {
 
 							if (response.data) {
-								
+
 								Swal.fire(
 									'Excelente!',
 									'El reporte ha sido eliminado exitosamente.',
@@ -1080,7 +1080,7 @@
 									this.detalle_paciente()
 
 								})
-								
+
 							}
 
 						})
@@ -1090,13 +1090,13 @@
 
 			},
 			editar_reporte(reporte){
-				
+
 				this.axios.post(process.env.VUE_APP_API_URL + 'editar_reporte.php', reporte)
 				// eslint-disable-next-line no-unused-vars
 				.then((response) => {
-					
+
 					if (response.data) {
-						
+
 						Swal.fire(
 							'Excelente!',
 							'El reporte ha sido actualizado exitosamente.',
@@ -1133,7 +1133,7 @@
 				let data = {
 
 					zona: zona,
-					
+
 				}
 
 				this.axios.post(process.env.VUE_APP_API_URL + 'obtener_colonias.php', data)
@@ -1157,7 +1157,7 @@
 					this.contacto_saved = true
 
 				}
-				
+
 			},
 			mostrar_registro_contacto(){
 				this.form_contacto = true
@@ -1209,18 +1209,18 @@
 
 		},
 		mounted(){
-			
+
 			//this.obtener_clasificacion()
 			this.obtener_vacunas()
 			this.obtener_sintomas()
 
 		},
 		watch: {
-			
+
 			show_dialog(val){
 
 				if (val) {
-					
+
 					if (this.obtener_detalle) {
 						this.detalle_paciente()
 					}else{
@@ -1251,7 +1251,7 @@
 				handler(val){
 
 					if (val) {
-						
+
 						let paciente = {}
 						paciente = this.paciente
 						paciente.categorias = this.categorias
@@ -1264,7 +1264,7 @@
 						})
 
 					}
-					
+
 
 				},
 				deep: true

@@ -3,13 +3,21 @@
         <v-container fluid>
             <v-row>
                 <v-col col="12" sm="6" md="4">
-                    <v-text-field v-model="busqueda" outlined label="Buscar" append-icon="mdi-magnify" type="text" autocomplete="off" hide-details dense></v-text-field>
+                    <v-text-field hide-details v-model="busqueda" outlined label="Buscar" append-icon="mdi-magnify" type="text" autocomplete="off" dense></v-text-field>
                 </v-col>
-               <v-col align="end">
+            </v-row>
+
+            <v-row align="center">
+                <v-col>
+                    <v-btn :color="paciente_sin_kit ? 'primary' : null" @click="filtrar_pacientes()">Pacientes Sin Kit</v-btn>
+                    <v-btn @click="obtener_pacientes()" class="ml-4">Actualizar</v-btn>
+                </v-col>
+                <v-col align="end">
                     <h1 class="pb-0 mb-0" style="font-size: 3em">{{ items.length }}</h1>
-                    <small class="font-weight-light mt-0 pt-0">Kits recomendados</small>
+                    <small class="font-weight-light mt-0 pt-0">
+                        {{ paciente_sin_kit ? 'Pacientes sin Kit' : 'Kits recomendados' }}
+                    </small>
                 </v-col>
-                
             </v-row>
 
             <v-row>
@@ -20,17 +28,16 @@
                         :items-per-page="20"
                         class="elevation-1"
                         hide-default-footer
-                        :search="busqueda"
                         :page.sync="page"
-                        @page-count="pageCount = $event"
                         :loading="loading"
+                        :search="busqueda"
+                        @page-count="pageCount = $event"
                     >
                         <template v-slot:[`item.nombre`]="{ item }">
                             {{ item.nombre.toUpperCase() }} {{ item.segundo_nombre.toUpperCase() }} {{ item.apellido.toUpperCase() }} {{ item.segundo_apellido.toUpperCase() }}
                         </template>
 
                         <template v-slot:[`item.colonia`]="{ item }">
-                           
 
                             <div v-if="item.colonia != 'SIN COLONIA'">
                                 {{ item.colonia }}
@@ -44,24 +51,40 @@
                                     SIN COLONIA
                                 </div>
                             </div>
-                            
+
                         </template>
-                        
-                        <template v-slot:[`item.requiere_azitromicina`]="{ item }"> 
+
+                        <template v-slot:[`item.requiere_azitromicina`]="{ item }">
                             <v-chip small v-if="item.requiere_azitromicina" color="red darken-1" dark>SI</v-chip>
                             <v-chip small v-if="!item.requiere_azitromicina" color="blue darken-1" dark>NO</v-chip>
                         </template>
 
-                        
-
                         <template v-slot:[`item.accion`]="{ item }">
-                            <v-btn @click="atender(item)" x-small dark color="red darken-1">
-                                PENDIENTE
-                            </v-btn>
 
-                            <v-btn class="ml-3" tile icon  @click="detalle(item)" small color="primary">
-                                <v-icon dark>mdi-pencil</v-icon>
-                            </v-btn>
+                            <div v-if="!paciente_sin_kit">
+                                <v-btn @click="atender(item)" tile icon small dark color="green darken-1">
+                                    <v-icon dark>
+                                        mdi-package-variant
+                                    </v-icon>
+                                </v-btn>
+
+                                <v-btn class="ml-3" tile icon  @click="detalle(item)" small color="primary">
+                                    <v-icon dark>mdi-pencil</v-icon>
+                                </v-btn>
+
+                                 <v-btn  @click="add_kit(false, item)" class="ml-3" tile icon small color="error">
+                                    <v-icon dark>mdi-close-circle</v-icon>
+                                </v-btn>
+                            </div>
+
+                            <div v-if="paciente_sin_kit">
+                                <v-btn @click="add_kit(true, item)" class="ml-3" tile icon small color="info">
+                                    <v-icon dark>mdi-account-plus</v-icon>
+                                </v-btn>
+                                <v-btn class="ml-3" tile icon  @click="detalle(item)" small color="primary">
+                                    <v-icon dark>mdi-pencil</v-icon>
+                                </v-btn>
+                            </div>
 
                         </template>
 
@@ -163,7 +186,8 @@
                 show_dialog: false,
                 obtener_detalle: false,
                 id_paciente: null,
-                loading: false
+                loading: false,
+                paciente_sin_kit: false
             }
         },
         methods: {
@@ -177,7 +201,10 @@
                 let usuario = JSON.parse(localStorage.getItem('usuario-campamentos'))
 
                 let data = {
-                    id_campamento: usuario.id_campamento
+                    id_campamento: usuario.id_campamento,
+                    pacientes_sin_kit: this.paciente_sin_kit,
+                    busqueda: this.busqueda,
+                    page: this.page
                 }
 
                 this.axios.post(process.env.VUE_APP_API_URL + 'obtener_farmacia_doctor.php', data)
@@ -186,7 +213,7 @@
                     this.headers = response.data.headers
                     this.items = response.data.items
                     this.loading = false
-                    
+
                 })
 
             },
@@ -213,12 +240,12 @@
 
                 this.axios.post(process.env.VUE_APP_API_URL + 'detalle_usuario.php', data)
                 .then((response) => {
-                    
-                    this.usuario = response.data 
-                    this.en_linea = response.data.en_linea 
+
+                    this.usuario = response.data
+                    this.en_linea = response.data.en_linea
 
                     if (response.data.clinica) {
-                        
+
                         this.clinica_seleccionada = response.data.clinica.id
 
                     }else{
@@ -243,9 +270,9 @@
 
                     this.axios.post(process.env.VUE_APP_API_URL + 'entregar_kit_doctor.php', this.entrega_medicamento)
                     .then((response) => {
-                        
+
                         if (response.data) {
-                            
+
                             Swal.fire(
                                 'Excelente!',
                                 'Se ha registrado la entrega del kit.',
@@ -257,14 +284,54 @@
                                 this.dialog = false
 
                             })
-                        
+
                         }
                     })
-                    
+
                 }
 
             },
+            filtrar_pacientes(){
 
+                this.paciente_sin_kit = !this.paciente_sin_kit
+
+                this.obtener_pacientes()
+
+            },
+            add_kit(value, item){
+
+                Swal.fire({
+                    title: '¿Está seguro?',
+                    text: value ? "Se agregará el kit al paciente!" : "Se removerá el kit del paciente",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: value ? '#3085d6' : '#e33d3d',
+                    cancelButtonColor: '#cccccc',
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonText: value ? 'SI, AGREGAR!' : 'SI, QUITAR!',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+
+                            const data = {
+                                add: value,
+                                id: item.id
+                            }
+
+                            console.log(data)
+
+                            this.axios.post(process.env.VUE_APP_API_URL + 'actualizar_kit.php', data)
+                            .then((response) => {
+
+                                if (response.data) {
+                                    this.obtener_pacientes()
+                                }
+
+                            })
+
+                        }
+                })
+
+            }
         },
         created(){
 
@@ -273,12 +340,12 @@
             this.campamento_select = usuario.id_campamento
 
             this.detalle_usuario()
-            
+
             this.obtener_pacientes()
 
             this.$nextTick(function () {
                 window.setInterval(() => {
-                    this.obtener_pacientes(this.campamento_select)
+                    // this.obtener_pacientes(this.campamento_select)
                 },5000);
             })
 

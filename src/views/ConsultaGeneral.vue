@@ -3,16 +3,14 @@
         <v-container fluid>
             <v-row align="center" v-if="usuario">
                 <v-col col="12" sm="6" md="4">
-                    <v-text-field v-model="busqueda" outlined label="Buscar" append-icon="mdi-magnify" type="text" autocomplete="off" hide-details dense></v-text-field>
+                    <v-text-field persistent-hint hint="Para buscar dar clic en el ícono de la lupa" @click:append="obtener_pacientes" v-model="busqueda" outlined label="Buscar" append-icon="mdi-magnify" type="text" autocomplete="off" dense></v-text-field>
                 </v-col>
-               
-                
             </v-row>
 
             <!-- Alerta -->
             <v-alert v-if="paciente_asignado" type="info" prominent dense text>
                 <v-row align="center" dense no-gutters>
-                   
+
                     <v-col>
                         <small>Paciente: </small>
                         <br>
@@ -41,21 +39,19 @@
                         :items-per-page="20"
                         class="elevation-1"
                         hide-default-footer
-                        :search="busqueda"
                         :page.sync="page"
-                        @page-count="pageCount = $event"
                     >
-                        <template v-slot:item.accion="{ item }">
-                           
+                        <template v-slot:[`item.accion`]="{ item }">
+
 
                             <v-btn class="ml-3" tile icon  @click="detalle(item)" small color="primary">
                                 <v-icon dark>mdi-pencil</v-icon>
                             </v-btn>
-                            
+
                         </template>
 
-                        <template v-slot:item.colonia="{ item }">
-                           
+                        <template v-slot:[`item.colonia`]="{ item }">
+
 
                             <div v-if="item.colonia != 'SIN COLONIA'">
                                 {{ item.colonia }}
@@ -69,10 +65,8 @@
                                     SIN COLONIA
                                 </div>
                             </div>
-                            
-                        </template>
 
-                        
+                        </template>
 
                     </v-data-table>
                 </v-col>
@@ -89,11 +83,11 @@
         <Form :usuario="usuario" @actualizarTabla="obtener_pacientes()" :obtener_detalle="obtener_detalle" :id_paciente="id_paciente" :show_dialog="show_dialog" @closeDialog="() => {
             obtener_detalle = false
             id_paciente = null
-            show_dialog = false    
+            show_dialog = false
         }" />
 
-        <CambioEstado 
-            :show_dialog="show_dialog_estado" 
+        <CambioEstado
+            :show_dialog="show_dialog_estado"
             :id_paciente="id_paciente"
             :nombre_paciente="nombre_paciente"
             @closeDialog="() => {
@@ -131,7 +125,7 @@
                 usuario: null,
                 show_dialog_estado: false,
                 page: 1,
-                pageCount: null,
+                pageCount: 20,
                 fav: true,
                 menu: false,
                 message: false,
@@ -153,10 +147,14 @@
                 let usuario = JSON.parse(localStorage.getItem('usuario-campamentos'))
                 usuario.id_campamento_filtrado = this.id_campamento_filtrado
 
+                usuario.page = this.page
+                usuario.busqueda = this.busqueda
+
                 this.axios.post(process.env.VUE_APP_API_URL + 'obtener_todos_pacientes.php', usuario)
                 .then((response) => {
                     this.items = response.data.items
                     this.headers = response.data.headers
+                    this.pageCount = response.data.pagination
                 })
 
             },
@@ -177,12 +175,12 @@
 
                 this.axios.post(process.env.VUE_APP_API_URL + 'detalle_usuario.php', data)
                 .then((response) => {
-                    
-                    this.usuario = response.data 
-                    this.en_linea = response.data.en_linea 
+
+                    this.usuario = response.data
+                    this.en_linea = response.data.en_linea
 
                     if (response.data.clinica) {
-                        
+
                         this.clinica_seleccionada = response.data.clinica.id
 
                     }else{
@@ -216,7 +214,7 @@
                     this.detalle_usuario()
                     this.menu = false
 
-                    
+
                 })
 
             },
@@ -275,7 +273,12 @@
                 this.id_campamento_filtrado = campamento.id
 
                 this.obtener_pacientes()
-                
+
+            },
+            search(){
+
+                console.log('search')
+
             }
 
         },
@@ -283,7 +286,7 @@
             menu: function(val){
 
                 if (val) {
-                    
+
                     let usuario = JSON.parse(localStorage.getItem('usuario-campamentos'))
 
                     let data = {
@@ -295,9 +298,20 @@
 
                         this.clinicas = response.data
                         console.log(response.data);
-                        
+
                     })
 
+                }
+
+            },
+            page: function(){
+
+                this.obtener_pacientes()
+            },
+            busqueda: function(val){
+
+                if (!val) {
+                    this.obtener_pacientes()
                 }
 
             }
@@ -314,8 +328,8 @@
 
             this.$nextTick(function () {
             window.setInterval(() => {
-                this.obtener_paciente()
-                this.obtener_pacientes()
+                //this.obtener_paciente()
+                //this.obtener_pacientes()
             },5000);
             })
 
