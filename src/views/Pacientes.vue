@@ -233,8 +233,8 @@
                 campamento_filtrado: null,
                 campamentos: [],
                 id_campamento_filtrado: null,
-                years: [2021, 2020],
-                year_filtro: 2021,
+                years: [2022, 2021, 2020],
+                year_filtro: 2022,
                 loading: false
 
             }
